@@ -1,24 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from '../src/redux/store';
 
-function App() {
+import Home from './pages/Home';
+import Welcome from './pages/Welcome';
+import Register from './pages/Register';
+import Profile from './pages/Login';
+
+
+const App = () => {
+
+  const isAuth = store.getState().user.isAuth;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          {/* Giriş yapmamış kullanıcılar için PublicRoute */}
+          <Route path="/welcome" element={isAuth ? <Navigate to="/home" /> : <Welcome />} />
+          <Route path="/register" element={isAuth ? <Navigate to="/home" /> : <Register />} />
+
+          {/* Giriş yapmış kullanıcılar için PrivateRoute */}
+          <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/welcome" />} />
+          <Route path="/profile" element={isAuth ? <Profile /> : <Navigate to="/welcome" />} />
+
+          {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
+          <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />
+        </Routes>
+      </Router>
+    </Provider>
   );
 }
 
