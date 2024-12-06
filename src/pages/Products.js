@@ -1,10 +1,8 @@
 import React from 'react';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
-import HomeGrid from '../components/homepage/HomeGrid';
 
-
-const Home = () => {
+const Products = () => {
     return (
         <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
             {/* Sidebar */}
@@ -13,14 +11,13 @@ const Home = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <Header title={"Dashboard"}/>
+                <Header title={"Ürünler"}/>
 
-                {/* Main grid content */}
-                <HomeGrid />
+                {/* Main grid content */}                
             </div>
         </div>
 
     );
 }
 
-export default Home;
+export default Products;

@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Welcome from './pages/Welcome';
 import Register from './pages/Register';
 import Profile from './pages/Login';
+import Products from './pages/Products';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           {/* Giriş yapmış kullanıcılar için PrivateRoute */}
           <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/welcome" />} />
           <Route path="/profile" element={isAuth ? <Profile /> : <Navigate to="/welcome" />} />
+          <Route path="/products" element={isAuth ? <Products /> : <Navigate to="/welcome" />} />
 
           {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
           <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />
