@@ -8,6 +8,7 @@ import Welcome from './pages/Welcome';
 import Register from './pages/Register';
 import Profile from './pages/Login';
 import Products from './pages/Products';
+import AddProduct from './pages/AddProduct';  // Import AddProduct component
 
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
 
           {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
           <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />
+          <Route path="/add-product" element={<AddProduct />} />  // AddProduct route
         </Routes>
       </Router>
     </Provider>
