@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    isAuth: true,
+    isAuth: false,
     user: null,
     isSidebarOpen: true,
 };
