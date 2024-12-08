@@ -39,8 +39,21 @@ const AddProduct = () => {
         setTimeout(() => navigate('/products'), 2000); // Redirect after 2 seconds (for animation)
     };
 
+    // Handle cancel button click
+    const handleCancel = () => {
+        navigate('/products');
+    };
+
     return (
-        <div className="flex justify-center items-center bg-gray-800 min-h-screen text-gray-100">
+        <div className="relative flex justify-center items-center bg-gray-800 min-h-screen text-gray-100">
+            <div className="absolute top-4 left-4">
+                <button
+                    onClick={handleCancel}
+                    className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
+                >
+                    X
+                </button>
+            </div>
             <div className="w-full max-w-lg bg-gray-700 p-8 rounded shadow-lg">
                 <h2 className="text-xl mb-4">Ürün Ekle</h2>
                 <div>
@@ -107,12 +120,20 @@ const AddProduct = () => {
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
-                    <button
-                        onClick={handleAddProduct}
-                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-                    >
-                        Ekle
-                    </button>
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={handleAddProduct}
+                            className="w-1/2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+                        >
+                            Ekle
+                        </button>
+                        <button
+                            onClick={handleCancel}
+                            className="w-1/2 bg-red-500 text-white p-2 rounded ml-4 hover:bg-red-600 transition"
+                        >
+                            İptal
+                        </button>
+                    </div>
                 </div>
 
                 {/* Confirmation table (temporary, only shows after product is added) */}
