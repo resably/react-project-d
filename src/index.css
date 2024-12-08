@@ -1,3 +1,4 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.page { @apply bg-[#111827] min-h-screen flex flex-col; }
