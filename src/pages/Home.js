@@ -15,6 +15,7 @@ const Home = () => {
                 {/* Header */}
                 <Header title={"Dashboard"}/>
 
+                
                 {/* Main grid content */}
                 <HomeGrid />
             </div>
