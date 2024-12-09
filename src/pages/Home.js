@@ -13,10 +13,12 @@ const Home = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <Header title={"Dashboard"}/>
+                <Header title={"Dashboard"} />
 
-                
-                {/* Main grid content */} 
+
+                {/* Main grid content */}
+                {/* Main grid content */}
+
                 <HomeGrid />
             </div>
         </div>
