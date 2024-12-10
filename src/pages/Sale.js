@@ -1,10 +1,9 @@
 import React from 'react';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
-import HomeGrid from '../components/homepage/HomeGrid';
+import SaleGrid from '../components/salepage/SaleGrid';
 
-
-const Home = () => {
+const Sale = () => {
     return (
         <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
             {/* Sidebar */}
@@ -17,13 +16,11 @@ const Home = () => {
 
 
                 {/* Main grid content */}
-                {/* Main grid content */}
-
-                <HomeGrid />
+                <SaleGrid />
             </div>
         </div>
 
     );
 }
 
-export default Home;
+export default Sale;
