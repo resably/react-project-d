@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';  // Added for navigation
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts } from '../redux/ProductsSlice';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 
-const Products = () => {
-    const [products, setProducts] = useState([]);
-    const navigate = useNavigate();  // Hook to navigate between pages
 
-    // Navigate to AddProduct page when Add Product button is clicked
+
+const Products = () => {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { items: products, status, error } = useSelector((state) => state.products);
+
+    useEffect(() => {
+        if (status === "idle") {
+            dispatch(fetchProducts());
+            console.log('fetching products');
+        }
+    }, [status, dispatch]);
+
     const handleAddProductRedirect = () => {
-        navigate('/add-product'); // Redirects to the add product page
+        navigate('/add-product');
     };
 
-    // Fetch products from a database or state (you can implement Firebase or other data storage here)
-    useEffect(() => {
-        // Fetch products from an API or database, for now it's empty
-        // setProducts(fetchedProducts);
-    }, []);
+    if (status === "loading") {
+        return <p className="text-white">Ürünler yükleniyor...</p>;
+    }
+
+    if (status === "failed") {
+        return <p className="text-red-500">Hata: {error}</p>;
+    }
+
 
     return (
         <div className="flex h-screen bg-[#111827] text-gray-100 overflow-hidden">
@@ -43,19 +59,19 @@ const Products = () => {
                                 <th className="px-4 py-2">İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className='table-auto w-full mt-4 bg-gray-800'>
                             {products.map((product) => (
                                 <tr key={product.id}>
-                                    <td className="border px-4 py-2">{product.name}</td>
-                                    <td className="border px-4 py-2">{product.brand}</td>
-                                    <td className="border px-4 py-2">{product.category}</td>
-                                    <td className="border px-4 py-2">{product.quantity}</td>
-                                    <td className="border px-4 py-2">{product.purchasePrice} TL</td>
-                                    <td className="border px-4 py-2">{product.sellingPrice} TL</td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border border-gray-700 px-4 py-2">{product.name}</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.brand}</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.category}</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.stock}</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.purchasePrice} TL</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.price} TL</td>
+                                    <td className="border border-gray-700 px-4 py-2">
                                         <button
                                             className="text-red-500 hover:underline"
-                                            // Handle delete or other actions here
+                                        // Handle delete or other actions here
                                         >
                                             Sil
                                         </button>

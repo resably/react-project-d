@@ -1,43 +1,54 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct } from "../redux/ProductsSlice";
+import { use } from 'react';
+
 
 const AddProduct = () => {
-    const [newProduct, setNewProduct] = useState({
-        productCode: '',
+
+    const navigate = useNavigate();
+
+    const dispatch = useDispatch();
+    const { error } = useSelector((state) => state.products);
+
+    const [isAdded, setIsAdded] = useState(false);
+
+
+    const [product, setProduct] = useState({
+        barcode: '',
         name: '',
         brand: '',
         category: '',
-        quantity: 0,
+        stock: 0,
         purchasePrice: 0,
-        sellingPrice: 0,
+        price: 0,
     });
 
-    const [addedProduct, setAddedProduct] = useState(null);
-    const navigate = useNavigate(); // Use navigate for redirection
-
-    // Handle input changes
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewProduct({ ...newProduct, [name]: value });
-    };
-
-    // Handle form submission (temporary, without Firebase for now)
     const handleAddProduct = () => {
-        // Add the new product to the table (for now, just in state)
-        setAddedProduct(newProduct);
-        // Reset form fields
-        setNewProduct({
-            productCode: '',
-            name: '',
-            brand: '',
-            category: '',
-            quantity: 0,
-            purchasePrice: 0,
-            sellingPrice: 0,
+        if (!product.barcode || !product.name) {
+            alert("Barkod ve ürün adı zorunludur!");
+            return;
+        }
+
+        dispatch(addProduct(product)).then((result) => {
+            if (result.type === 'products/addProduct/fulfilled') {
+                setIsAdded(true);
+            }
         });
-        // Navigate back to products page after adding product
-        setTimeout(() => navigate('/products'), 2000); // Redirect after 2 seconds (for animation)
+        setProduct({ name: '', brand: '', category: '', stock: 0, purchasePrice: 0, price: 0 });
+        alert("Ürün eklendi!");
+
     };
+
+    useEffect(() => {
+        if (isAdded) {
+            setTimeout(() => {
+                navigate('/products');
+            }, 1000);
+        }
+    }, [isAdded, navigate]);
+
 
     // Handle cancel button click
     const handleCancel = () => {
@@ -57,12 +68,12 @@ const AddProduct = () => {
             <div className="w-full max-w-lg bg-gray-700 p-8 rounded shadow-lg">
                 <h2 className="text-xl mb-4">Ürün Ekle</h2>
                 <div>
-                    <label className="block mb-2">Ürün Kodu:</label>
+                    <label className="block mb-2">Ürün Barkodu:</label>
                     <input
                         type="text"
                         name="productCode"
-                        value={newProduct.productCode}
-                        onChange={handleChange}
+                        value={product.barcode}
+                        onChange={(e) => setProduct({ ...product, barcode: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -70,8 +81,8 @@ const AddProduct = () => {
                     <input
                         type="text"
                         name="name"
-                        value={newProduct.name}
-                        onChange={handleChange}
+                        value={product.name}
+                        onChange={(e) => setProduct({ ...product, name: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -79,8 +90,8 @@ const AddProduct = () => {
                     <input
                         type="text"
                         name="brand"
-                        value={newProduct.brand}
-                        onChange={handleChange}
+                        value={product.brand}
+                        onChange={(e) => setProduct({ ...product, brand: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -88,8 +99,8 @@ const AddProduct = () => {
                     <input
                         type="text"
                         name="category"
-                        value={newProduct.category}
-                        onChange={handleChange}
+                        value={product.category}
+                        onChange={(e) => setProduct({ ...product, category: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -97,8 +108,8 @@ const AddProduct = () => {
                     <input
                         type="number"
                         name="quantity"
-                        value={newProduct.quantity}
-                        onChange={handleChange}
+                        value={product.stock}
+                        onChange={(e) => setProduct({ ...product, stock: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -106,8 +117,8 @@ const AddProduct = () => {
                     <input
                         type="number"
                         name="purchasePrice"
-                        value={newProduct.purchasePrice}
-                        onChange={handleChange}
+                        value={product.purchasePrice}
+                        onChange={(e) => setProduct({ ...product, purchasePrice: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -115,8 +126,8 @@ const AddProduct = () => {
                     <input
                         type="number"
                         name="sellingPrice"
-                        value={newProduct.sellingPrice}
-                        onChange={handleChange}
+                        value={product.price}
+                        onChange={(e) => setProduct({ ...product, price: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 
@@ -136,34 +147,38 @@ const AddProduct = () => {
                     </div>
                 </div>
 
-                {/* Confirmation table (temporary, only shows after product is added) */}
-                {addedProduct && (
-                    <div className="mt-8 p-4 bg-gray-600 rounded">
-                        <h3 className="text-lg mb-4">Ürün Eklendi!</h3>
-                        <table className="table-auto w-full bg-gray-700 rounded">
-                            <thead>
-                                <tr>
-                                    <th className="px-4 py-2">Ürün Adı</th>
-                                    <th className="px-4 py-2">Marka</th>
-                                    <th className="px-4 py-2">Kategori</th>
-                                    <th className="px-4 py-2">Adet</th>
-                                    <th className="px-4 py-2">Alış Fiyatı</th>
-                                    <th className="px-4 py-2">Satış Fiyatı</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className="border px-4 py-2">{addedProduct.name}</td>
-                                    <td className="border px-4 py-2">{addedProduct.brand}</td>
-                                    <td className="border px-4 py-2">{addedProduct.category}</td>
-                                    <td className="border px-4 py-2">{addedProduct.quantity}</td>
-                                    <td className="border px-4 py-2">{addedProduct.purchasePrice}₺</td>
-                                    <td className="border px-4 py-2">{addedProduct.sellingPrice}₺</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                {error && <p style={{ color: "red" }}>{error}</p>}
+
+                {/* Confirmation table (temporary, only shows after product is added)
+                    {addedProduct && (
+                        <div className="mt-8 p-4 bg-gray-600 rounded">
+                            <h3 className="text-lg mb-4">Ürün Eklendi!</h3>
+                            <table className="table-auto w-full bg-gray-700 rounded">
+                                <thead>
+                                    <tr>
+                                        <th className="px-4 py-2">Barkod</th>
+                                        <th className="px-4 py-2">Ürün Adı</th>
+                                        <th className="px-4 py-2">Marka</th>
+                                        <th className="px-4 py-2">Kategori</th>
+                                        <th className="px-4 py-2">Adet</th>
+                                        <th className="px-4 py-2">Alış Fiyatı</th>
+                                        <th className="px-4 py-2">Satış Fiyatı</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="border px-4 py-2">{addedProduct.barcode}</td>
+                                        <td className="border px-4 py-2">{addedProduct.name}</td>
+                                        <td className="border px-4 py-2">{addedProduct.brand}</td>
+                                        <td className="border px-4 py-2">{addedProduct.category}</td>
+                                        <td className="border px-4 py-2">{addedProduct.stock}</td>
+                                        <td className="border px-4 py-2">{addedProduct.purchasePrice}₺</td>
+                                        <td className="border px-4 py-2">{addedProduct.price}₺</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    )} */}
             </div>
         </div>
     );
