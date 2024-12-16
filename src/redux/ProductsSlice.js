@@ -1,5 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  addDoc,
+  deleteDoc,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 // Add Product
@@ -27,6 +36,23 @@ export const addProduct = createAsyncThunk(
       return { id: product.barcode, ...product };
     } catch (error) {
       return rejectWithValue("Ürün ekleme sırasında bir hata oluştu.");
+    }
+  }
+);
+
+// Update Product
+export const updateProduct = createAsyncThunk(
+  "products/updateProduct",
+  async ({ id, updatedProduct }, { rejectWithValue }) => {
+    try {
+      const productRef = doc(db, "products", id);
+
+      // Belgeyi güncelle
+      await updateDoc(productRef, updatedProduct);
+
+      return { id, ...updatedProduct };
+    } catch (error) {
+      return rejectWithValue("Ürün güncelleme sırasında bir hata oluştu.");
     }
   }
 );
@@ -63,6 +89,7 @@ const productsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Add Product
       .addCase(addProduct.pending, (state, action) => {
         state.status = "loading";
       })
@@ -74,6 +101,26 @@ const productsSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.error = action.payload;
       })
+
+      // Update Product
+      .addCase(updateProduct.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const updatedIndex = state.items.findIndex(
+          (item) => item.id === action.payload.id
+        );
+        if (updatedIndex !== -1) {
+          state.items[updatedIndex] = action.payload;
+        }
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Fetch Products
       .addCase(fetchProducts.pending, (state, action) => {
         state.status = "loading";
       })
@@ -84,7 +131,7 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.error = action.payload;
         state.status = "failed";
-      });
+      });,
   },
 });
 

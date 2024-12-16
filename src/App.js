@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from '../src/redux/store';
@@ -9,9 +9,9 @@ import Register from './pages/Register';
 import Profile from './pages/Login';
 import Products from './pages/Products';
 import AddProduct from './pages/AddProduct';  // Import AddProduct component
+import EditProduct from './pages/edit-product'; // Import EditProduct component
 import User from './pages/User';
 import Sale from './pages/Sale';
-
 
 const App = () => {
 
@@ -34,7 +34,8 @@ const App = () => {
 
           {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
           <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />
-          <Route path="/add-product" element={<AddProduct />} />  // AddProduct route
+          <Route path="/add-product" element={<AddProduct />} />  {/* AddProduct route */}
+          <Route path="/edit-product/:id" element={<EditProduct />} /> {/* EditProduct route */}
         </Routes>
       </Router>
     </Provider>

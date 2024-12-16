@@ -5,10 +5,7 @@ import { fetchProducts } from '../redux/ProductsSlice';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 
-
-
 const Products = () => {
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -25,6 +22,10 @@ const Products = () => {
         navigate('/add-product');
     };
 
+    const handleEditRedirect = (productId) => {
+        navigate(`/edit-product/${productId}`);
+    };
+
     if (status === "loading") {
         return <p className="text-white">Ürünler yükleniyor...</p>;
     }
@@ -32,7 +33,6 @@ const Products = () => {
     if (status === "failed") {
         return <p className="text-red-500">Hata: {error}</p>;
     }
-
 
     return (
         <div className="flex h-screen bg-[#111827] text-gray-100 overflow-hidden">
@@ -59,7 +59,7 @@ const Products = () => {
                                 <th className="px-4 py-2">İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody className='table-auto w-full mt-4 bg-gray-800'>
+                        <tbody className="table-auto w-full mt-4 bg-gray-800">
                             {products.map((product) => (
                                 <tr key={product.id}>
                                     <td className="border border-gray-700 px-4 py-2">{product.name}</td>
@@ -68,12 +68,21 @@ const Products = () => {
                                     <td className="border border-gray-700 px-4 py-2">{product.stock}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.purchasePrice} TL</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.price} TL</td>
-                                    <td className="border border-gray-700 px-4 py-2">
+                                    <td className="border border-gray-700 px-4 py-2 flex gap-4">
+                                        {/* Sil Butonu */}
                                         <button
                                             className="text-red-500 hover:underline"
-                                        // Handle delete or other actions here
+                                            // Sil butonu için gerekli handle eklenebilir
                                         >
                                             Sil
+                                        </button>
+
+                                        {/* Düzenle Butonu */}
+                                        <button
+                                            className="text-yellow-400 hover:underline"
+                                            onClick={() => handleEditRedirect(product.id)}
+                                        >
+                                            Düzenle
                                         </button>
                                     </td>
                                 </tr>
@@ -85,6 +94,5 @@ const Products = () => {
         </div>
     );
 };
-
 
 export default Products;
