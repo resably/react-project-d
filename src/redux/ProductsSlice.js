@@ -131,7 +131,7 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.error = action.payload;
         state.status = "failed";
-      });,
+      });
   },
 });
 
