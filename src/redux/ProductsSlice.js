@@ -16,7 +16,7 @@ export const addProduct = createAsyncThunk(
   "products/addProduct",
   async (product, { rejectWithValue }) => {
     try {
-      const productRef = doc(db, "products", product.barcode); // Belge ID'si = Barkod
+      const productRef = doc(db, "products", product.barcode); // Document ID = Barkod
       const productSnap = await getDoc(productRef);
 
       if (productSnap.exists()) {
@@ -31,6 +31,8 @@ export const addProduct = createAsyncThunk(
         stock: product.stock,
         purchasePrice: product.purchasePrice,
         price: product.price,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
       });
 
       return { id: product.barcode, ...product };
@@ -47,12 +49,29 @@ export const updateProduct = createAsyncThunk(
     try {
       const productRef = doc(db, "products", id);
 
-      // Belgeyi güncelle
+      // Update the product
       await updateDoc(productRef, updatedProduct);
 
       return { id, ...updatedProduct };
     } catch (error) {
       return rejectWithValue("Ürün güncelleme sırasında bir hata oluştu.");
+    }
+  }
+);
+
+// Delete Product
+export const deleteProduct = createAsyncThunk(
+  "products/deleteProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const productRef = doc(db, "products", id);
+
+      // Delete the product
+      await deleteDoc(productRef);
+
+      return id;
+    } catch (error) {
+      return rejectWithValue("Ürün silme sırasında bir hata oluştu.");
     }
   }
 );
@@ -66,8 +85,8 @@ export const fetchProducts = createAsyncThunk(
       const snapshot = await getDocs(productsCollection);
 
       const products = snapshot.docs.map((doc) => ({
-        id: doc.id, // Belge ID'si
-        ...doc.data(), // Firestore'daki veriler
+        id: doc.id, // Document ID
+        ...doc.data(), // Document Data
       }));
 
       return products;
@@ -90,7 +109,7 @@ const productsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Add Product
-      .addCase(addProduct.pending, (state, action) => {
+      .addCase(addProduct.pending, (state) => {
         state.status = "loading";
       })
       .addCase(addProduct.fulfilled, (state, action) => {
@@ -120,8 +139,21 @@ const productsSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Delete Product
+      .addCase(deleteProduct.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
       // Fetch Products
-      .addCase(fetchProducts.pending, (state, action) => {
+      .addCase(fetchProducts.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {

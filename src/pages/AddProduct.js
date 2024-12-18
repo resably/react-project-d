@@ -45,7 +45,7 @@ const AddProduct = () => {
         if (isAdded) {
             setTimeout(() => {
                 navigate('/products');
-            }, 1000);
+            }, 500);
         }
     }, [isAdded, navigate]);
 

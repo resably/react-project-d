@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../redux/ProductsSlice';
+import { fetchProducts, deleteProduct } from '../redux/ProductsSlice';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 
@@ -15,15 +15,28 @@ const Products = () => {
         if (status === "idle") {
             dispatch(fetchProducts());
             console.log('fetching products');
+            console.log(products);
         }
     }, [status, dispatch]);
 
     const handleAddProductRedirect = () => {
-        navigate('/add-product');
+        navigate('/products/add-product');
     };
 
     const handleEditRedirect = (productId) => {
-        navigate(`/edit-product/${productId}`);
+        navigate(`/products/edit-product/${productId}`);
+    };
+
+    const handleProductDetailsRedirect = (productId) => {
+        navigate(`/products/${productId}`);
+    }
+
+    const handleDeleteProduct = (productId) => {
+        const confirmDelete = window.confirm("Ürünü silmek istediğinize emin misiniz?");
+        if (confirmDelete) {
+            dispatch(deleteProduct(productId));
+            navigate('/products');
+        }
     };
 
     if (status === "loading") {
@@ -50,6 +63,7 @@ const Products = () => {
                     <table className="table-auto w-full mt-4 bg-gray-800 rounded">
                         <thead>
                             <tr>
+                                <th className="px-4 py-2">Barkod</th>
                                 <th className="px-4 py-2">Ürün Adı</th>
                                 <th className="px-4 py-2">Marka</th>
                                 <th className="px-4 py-2">Kategori</th>
@@ -62,28 +76,40 @@ const Products = () => {
                         <tbody className="table-auto w-full mt-4 bg-gray-800">
                             {products.map((product) => (
                                 <tr key={product.id}>
+                                    <td className="border border-gray-700 px-4 py-2">{product.barcode}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.name}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.brand}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.category}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.stock}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.purchasePrice} TL</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.price} TL</td>
-                                    <td className="border border-gray-700 px-4 py-2 flex gap-4">
-                                        {/* Sil Butonu */}
-                                        <button
-                                            className="text-red-500 hover:underline"
-                                            // Sil butonu için gerekli handle eklenebilir
-                                        >
-                                            Sil
-                                        </button>
+                                    <td className="border border-gray-700 px-4 py-2">
+                                        <div className="flex justify-center gap-3">
+                                            {/* Sil Butonu */}
+                                            <button
+                                                className="text-white hover:bg-red-400 bg-red-500 px-2 py-1 rounded font-light text-base w-20"
+                                                onClick={() => handleDeleteProduct(product.id)}
+                                            >
+                                                Sil
+                                            </button>
 
-                                        {/* Düzenle Butonu */}
-                                        <button
-                                            className="text-yellow-400 hover:underline"
-                                            onClick={() => handleEditRedirect(product.id)}
-                                        >
-                                            Düzenle
-                                        </button>
+                                            {/* Düzenle Butonu */}
+                                            <button
+                                                className="text-white hover:bg-orange-400 bg-orange-500 px-2 py-1 rounded font-light text-base w-20"
+                                                onClick={() => handleEditRedirect(product.id)}
+                                            >
+                                                Düzenle
+                                            </button>
+
+                                            {/* Detaylar Butonu */}
+                                            <button
+                                                className="text-white hover:bg-green-400 bg-green-500 px-2 py-1 rounded font-light text-base w-20"
+                                                onClick={() => handleProductDetailsRedirect(product.id)}
+                                            // Detaylar butonu için gerekli handle eklenebilir
+                                            >
+                                                Detaylar
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

@@ -8,7 +8,7 @@ const HomeGrid = () => {
         { icon: <GiMoneyStack size={120} color="#10B981" />, label: "Muhasebe" },
         { icon: <MdOutlineTrendingUp size={120} color="#3B82F6" />, label: "Analiz" },
         { icon: <MdOutlineShoppingBag size={120} color="#8B5CF6" />, label: "Ürünler" },
-        { icon: <MdOutlineWarehouse size={120} color="#ED333A"/>, label: "Stoklar" },
+        { icon: <MdOutlineWarehouse size={120} color="#ED333A" />, label: "Stoklar" },
         { icon: <MdOutlinePerson size={120} color="#EC4899" />, label: "Kullanıcı" },
     ];
 

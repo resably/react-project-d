@@ -20,6 +20,7 @@ const EditProduct = () => {
         stock: 0,
         purchasePrice: 0,
         price: 0,
+        lastUpdated: new Date().toISOString(),
     });
 
     // Ürün bilgilerini form state'ine yükle
@@ -33,6 +34,7 @@ const EditProduct = () => {
                 stock: selectedProduct.stock || 0,
                 purchasePrice: selectedProduct.purchasePrice || 0,
                 price: selectedProduct.price || 0,
+                lastUpdated: new Date().toISOString(),
             });
         }
     }, [selectedProduct]);
