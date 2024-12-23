@@ -13,6 +13,7 @@ import EditProduct from './pages/EditProduct';
 import ProductDetails from './pages/ProductDetails';
 import User from './pages/User';
 import Sale from './pages/Sale';
+import Accounting from './pages/Accounting';
 
 const App = () => {
 
@@ -35,7 +36,8 @@ const App = () => {
           <Route path="/products/add-product" element={isAuth ? <AddProduct /> : <Navigate to="/welcome" />} />
           <Route path="/products/edit-product/:id" element={isAuth ? <EditProduct /> : <Navigate to="/welcome" />} />
           <Route path="/products/:id" element={isAuth ? <ProductDetails /> : <Navigate to="/welcome" />} />
-          
+          <Route path="/accounting" element={isAuth ? <Accounting /> : <Navigate to="/welcome" />} />
+
           {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
           <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />
 
