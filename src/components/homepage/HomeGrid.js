@@ -15,13 +15,13 @@ const HomeGrid = () => {
     return (
         <div className="grid grid-cols-3 gap-4 p-4">
             {items.map((item, index) => (
-                <div
+                <button
                     key={index}
-                    className="bg-gray-700 shadow-lg p-4 rounded-lg flex flex-col items-center"
+                    className="bg-gray-700 shadow-lg p-4 rounded-lg flex flex-col items-center cursor-pointer hover:bg-gray-600 transition border border-gray-500 focus:ring focus:ring-gray-400 focus:outline-none"
                 >
                     <div className="mb-4">{item.icon}</div>
-                    <p className="text-lg">{item.label}</p>
-                </div>
+                    <p className="text-lg font-semibold text-white">{item.label}</p>
+                </button>
             ))}
         </div>
     );

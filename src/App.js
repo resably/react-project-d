@@ -31,7 +31,7 @@ const App = () => {
           <Route path="/profile" element={isAuth ? <Profile /> : <Navigate to="/welcome" />} />
           <Route path="/products" element={isAuth ? <Products /> : <Navigate to="/welcome" />} />
           <Route path="/users" element={isAuth ? <User /> : <Navigate to="/welcome" />} />
-          <Route path='/orders' element={isAuth ? <Sale /> : <Navigate to="/welcome" />} />
+          <Route path='/sales' element={isAuth ? <Sale /> : <Navigate to="/welcome" />} />
           <Route path="/products/add-product" element={isAuth ? <AddProduct /> : <Navigate to="/welcome" />} />
           <Route path="/products/edit-product/:id" element={isAuth ? <EditProduct /> : <Navigate to="/welcome" />} />
           <Route path="/products/:id" element={isAuth ? <ProductDetails /> : <Navigate to="/welcome" />} />
