@@ -48,11 +48,11 @@ const EditProduct = () => {
         // Redux ile güncelleme işlemini tetikle
         dispatch(updateProduct({ id, updatedProduct: product }));
         alert('Ürün başarıyla güncellendi!');
-        navigate('/products'); // Güncelleme sonrası ürün listesine dön
+        navigate(-1); // Güncelleme sonrası ürün listesine dön
     };
 
     const handleCancel = () => {
-        navigate('/products'); // İptal edilirse ürün listesine dön
+        navigate(-1); // İptal edilirse ürün listesine dön
     };
 
     return (

@@ -14,6 +14,11 @@ import ProductDetails from './pages/ProductDetails';
 import User from './pages/User';
 import Sale from './pages/Sale';
 import Accounting from './pages/Accounting';
+import ToSale from './pages/ToSale';
+import SaleInvoices from './pages/SaleInvoices';
+import Customers from './pages/Customers';
+import AddCustomer from './pages/AddCustomer';
+import CustomerDetails from './pages/CustomerDetails';
 
 const App = () => {
 
@@ -37,6 +42,11 @@ const App = () => {
           <Route path="/products/edit-product/:id" element={isAuth ? <EditProduct /> : <Navigate to="/welcome" />} />
           <Route path="/products/:id" element={isAuth ? <ProductDetails /> : <Navigate to="/welcome" />} />
           <Route path="/accounting" element={isAuth ? <Accounting /> : <Navigate to="/welcome" />} />
+          <Route path="/sales/tosale" element={isAuth ? <ToSale /> : <Navigate to="/welcome" />} />
+          <Route path="/sales/invoices" element={isAuth ? <SaleInvoices /> : <Navigate to="/welcome" />} />
+          <Route path="/customers" element={isAuth ? <Customers /> : <Navigate to="/welcome" />} />
+          <Route path="/customers/add-customer" element={isAuth ? <AddCustomer /> : <Navigate to="/welcome" />} />
+          <Route path="/customers/:id" element={isAuth ? <CustomerDetails /> : <Navigate to="/welcome" />} />
 
           {/* Default route: Giriş yapılmışsa, home'a yönlendirilir, yoksa login'e */}
           <Route path="/" element={isAuth ? <Navigate to="/home" /> : <Navigate to="/welcome" />} />

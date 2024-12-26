@@ -6,8 +6,8 @@ const SaleMainGrid = () => {
     const navigate = useNavigate();
 
     const items = [
-        { icon: <MdOutlineShoppingCart size={120} color="#F59E0B" />, label: "Satış Ekranı", path: "/sales" },
-        { icon: <MdOutlineDescription size={120} color="#10B981" />, label: "Faturalar", path: "/invoices" },
+        { icon: <MdOutlineShoppingCart size={120} color="#F59E0B" />, label: "Satış Ekranı", path: "/sales/tosale" },
+        { icon: <MdOutlineDescription size={120} color="#10B981" />, label: "Faturalar", path: "/sales/invoices" },
     ];
 
     return (

@@ -22,7 +22,7 @@ const SIDEBAR_ITEMS = [
   { name: "Alış", icon: MdAddShoppingCart, color: "#EF4444", href: "/buy" },
   { name: "Muhasebe", icon: GiMoneyStack, color: "#10B981", href: "/accounting" },
   { name: "Analiz", icon: MdOutlineTrendingUp, color: "#3B82F6", href: "/analytics" },
-  { name: "Kullanıcı", icon: MdOutlinePerson, color: "#EC4899", href: "/users" },
+  { name: "Cari Hesaplar", icon: MdOutlinePerson, color: "#EC4899", href: "/customers" },
   { name: "Ayarlar", icon: MdOutlineSettings, color: "#6EE7B7", href: "/settings" },
 ];
 

@@ -3,6 +3,7 @@ import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import UserGrid from '../components/userpage/UserGrid';
 
+// not used
 const User = () => {
     return (
         <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
