@@ -9,7 +9,7 @@ const ProductDetailsGrid = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { id } = useParams(); // Düzenlenecek ürünün ID'sini URL'den al
+    const { id } = useParams(); // product id hook
     const { items: products } = useSelector((state) => state.products);
 
     const selectedProduct = products.find((product) => product.id === id);

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateProduct } from '../redux/ProductsSlice';
+import { updateProduct, fetchCategories } from '../redux/ProductsSlice';
 
 const EditProduct = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { id } = useParams(); // Düzenlenecek ürünün ID'sini URL'den al
     const { items: products } = useSelector((state) => state.products);
+    const [subCategories, setSubCategories] = useState([]);
+    const [noSubCategories, setNoSubCategories] = useState(false);
+    const { categories } = useSelector((state) => state.products);
 
     // Seçilen ürünü ID'ye göre bul
     const selectedProduct = products.find((product) => product.id === id);
@@ -17,6 +20,7 @@ const EditProduct = () => {
         name: '',
         brand: '',
         category: '',
+        subCategory: '',
         stock: 0,
         purchasePrice: 0,
         price: 0,
@@ -55,6 +59,29 @@ const EditProduct = () => {
         navigate(-1); // İptal edilirse ürün listesine dön
     };
 
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
+    const handleCategoryChange = (e) => {
+        const selectedCategoryId = e.target.value;
+        setProduct({ ...product, category: selectedCategoryId, subCategory: "" });
+
+        // Seçilen kategoriye ait alt kategorileri filtrele
+        const selectedCategory = categories.find(
+            (category) => category.id === selectedCategoryId
+        );
+
+        if (selectedCategory && selectedCategory.subCategories.length > 0) {
+            setSubCategories(selectedCategory.subCategories);
+            setNoSubCategories(false); // Alt kategoriler varsa, "Alt kategori yok" mesajını kaldır
+        } else {
+            setSubCategories([]);
+            setNoSubCategories(true); // Alt kategori yoksa, "Alt kategori yok" mesajını göster
+        }
+    };
+
+
     return (
         <div className="relative flex justify-center items-center bg-gray-800 min-h-screen text-gray-100">
             <div className="absolute top-4 left-4">
@@ -66,7 +93,7 @@ const EditProduct = () => {
                 </button>
             </div>
             <div className="w-full max-w-lg bg-gray-700 p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Ürün Düzenle</h2>
+                <h2 className="text-xl mb-4 font-bold">Ürün Düzenle</h2>
                 <div>
                     <label className="block mb-2">Ürün Barkodu:</label>
                     <input
@@ -93,12 +120,37 @@ const EditProduct = () => {
                     />
 
                     <label className="block mb-2">Kategori:</label>
-                    <input
-                        type="text"
+                    <select
                         value={product.category}
-                        onChange={(e) => setProduct({ ...product, category: e.target.value })}
+                        onChange={handleCategoryChange}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
-                    />
+                    >
+                        <option value="">Kategori Seçiniz</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.name}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label className="block mb-2">Alt Kategori:</label>
+                    <select
+                        value={product.subCategory}
+                        onChange={(e) => setProduct({ ...product, subCategory: e.target.value })}
+                        className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
+                        disabled={noSubCategories} // Alt kategori yoksa seçimi disable et
+                    >
+                        <option value="">Alt Kategori Seçiniz</option>
+                        {noSubCategories ? (
+                            <option disabled>Alt Kategori Yok</option> // Alt kategori yoksa mesaj göster
+                        ) : (
+                            subCategories.map((subCategory) => (
+                                <option key={subCategory.id} value={subCategory.id}>
+                                    {subCategory}
+                                </option>
+                            ))
+                        )}
+                    </select>
 
                     <label className="block mb-2">Adet:</label>
                     <input

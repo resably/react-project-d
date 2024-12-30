@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { saveSale, updateProductStocks } from "../../redux/salesSlice";
+import { savePurchase, updateProductStocks } from "../../redux/purchasesSlice";
 import { fetchCustomers } from "../../redux/CustomerSlice";
 import { fetchProducts } from "../../redux/ProductsSlice";
 
@@ -8,7 +8,7 @@ function SaleGrid() {
 
   const dispatch = useDispatch();
 
-  const { items: products, status, error } = useSelector((state) => state.products);
+  const { items: products } = useSelector((state) => state.products);
   const { customers } = useSelector((state) => state.customers);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,13 +94,13 @@ function SaleGrid() {
       customerName: selectedCustomer.name,
       customerManager: selectedCustomer.manager,
       paymentType: selectedPaymentType,
-      type: "Satış",
+      type: "Alış",
       saleDate: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
     };
 
     // Önce satışı kaydet
-    dispatch(saveSale(saleData))
+    dispatch(savePurchase(saleData))
       .unwrap()
       .then(() => {
         // Ardından stokları güncelle
@@ -347,7 +347,7 @@ function SaleGrid() {
             onClick={handleNewSale}
             className="flex-1 p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-400"
           >
-            YENİ SATIŞ
+            YENİ ALIŞ
           </button>
         </div>
       </div>

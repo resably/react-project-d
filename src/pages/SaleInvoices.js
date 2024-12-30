@@ -12,7 +12,7 @@ const SaleInvoices = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <Header title={"Dashboard"} />
+                <Header title={"Satış Faturaları"} />
                 
                 {/* Main grid content */}
                 <SaleInvoicesGrid />

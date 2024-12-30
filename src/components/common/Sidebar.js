@@ -8,7 +8,6 @@ import {
   MdOutlinePerson,
   MdOutlineShoppingBag,
   MdOutlineShoppingCart,
-  MdOutlineTrendingUp,
   MdOutlineSettings,
   MdOutlineMenu,
   MdAddShoppingCart,
@@ -19,9 +18,8 @@ const SIDEBAR_ITEMS = [
   { name: "Dashboard", icon: MdOutlineDashboard, color: "#6366f1", href: "/" },
   { name: "Ürünler", icon: MdOutlineShoppingBag, color: "#8B5CF6", href: "/products" },
   { name: "Satış", icon: MdOutlineShoppingCart, color: "#F59E0B", href: "/sales" },
-  { name: "Alış", icon: MdAddShoppingCart, color: "#EF4444", href: "/buy" },
+  { name: "Alış", icon: MdAddShoppingCart, color: "#EF4444", href: "/purchases" },
   { name: "Muhasebe", icon: GiMoneyStack, color: "#10B981", href: "/accounting" },
-  { name: "Analiz", icon: MdOutlineTrendingUp, color: "#3B82F6", href: "/analytics" },
   { name: "Cari Hesaplar", icon: MdOutlinePerson, color: "#EC4899", href: "/customers" },
   { name: "Ayarlar", icon: MdOutlineSettings, color: "#6EE7B7", href: "/settings" },
 ];

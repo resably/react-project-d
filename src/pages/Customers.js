@@ -9,7 +9,7 @@ const Customers = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { customers, status, error } = useSelector((state) => state.customers);
+    const { customers, status } = useSelector((state) => state.customers);
 
     useEffect(() => {
         if (status === 'idle') {
@@ -26,18 +26,29 @@ const Customers = () => {
         navigate(`/customers/${customerId}`);
     };
 
+    const handleCustomerGroupsRedirect = () => {
+        navigate('/customers/groups');
+    };
+
 
     return (
         <div className="flex h-screen bg-[#111827] text-gray-100 overflow-hidden">
             <Sidebar />
             <div className="flex-1 flex flex-col">
-                <Header title="Ürünler" />
+                <Header title="Cari Hesaplar" />
                 <div className="p-6">
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                         onClick={handleAddCustomerRedirect}
                     >
                         Cari Ekle
+                    </button>
+
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ml-4"
+                        onClick={handleCustomerGroupsRedirect}
+                    >
+                        Gruplar
                     </button>
 
                     <table className="table-auto w-full mt-4 bg-gray-800 rounded">
@@ -49,6 +60,7 @@ const Customers = () => {
                                 <th className="px-4 py-2">Telefon Numarası</th>
                                 <th className="px-4 py-2">E-posta</th>
                                 <th className="px-4 py-2">Bakiye *</th>
+                                <th className="px-4 py-2">Grubu</th>
                                 <th className="px-4 py-2">İşlemler</th>
                             </tr>
                         </thead>
@@ -61,7 +73,8 @@ const Customers = () => {
                                     <td className="border border-gray-700 px-4 py-2">{customers.phone}</td>
                                     <td className="border border-gray-700 px-4 py-2">{customers.email}</td>
                                     <td className="border border-gray-700 px-4 py-2">{customers.balance}</td>
-                                    <td className="border border-gray-700 px-4 py-2">
+                                    <td className="border border-gray-700 px-4 py-2">{customers.group}</td>
+                                    <td className="border border-gray-700 px-4 py-2 max-w-40">
                                         <div className="flex justify-center gap-3">
                                             {/* Sil Butonu */}
                                             <button

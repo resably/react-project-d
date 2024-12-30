@@ -8,6 +8,7 @@ import {
   deleteDoc,
   getDoc,
   setDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
@@ -28,6 +29,7 @@ export const addProduct = createAsyncThunk(
         name: product.name,
         brand: product.brand,
         category: product.category,
+        subCategory: product.subCategory,
         stock: product.stock,
         purchasePrice: product.purchasePrice,
         price: product.price,
@@ -96,8 +98,115 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+// Add Category
+export const addCategory = createAsyncThunk(
+  "products/addCategory",
+  async (category, { rejectWithValue }) => {
+    try {
+      const categoryRef = doc(db, "categories", category.name);
+      const categorySnap = await getDoc(categoryRef);
+
+      if (categorySnap.exists()) {
+        return rejectWithValue("Bu kategori zaten mevcut.");
+      }
+
+      await setDoc(categoryRef, {
+        name: category.name,
+        subCategories: category.subCategories,
+        description: category.description,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+      });
+
+      return { id: category.name, ...category };
+    } catch (error) {
+      return rejectWithValue("Kategori ekleme sırasında bir hata oluştu.");
+    }
+  }
+);
+
+// Fetch Categories
+export const fetchCategories = createAsyncThunk(
+  "products/fetchCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const categoriesCollection = collection(db, "categories");
+      const snapshot = await getDocs(categoriesCollection);
+
+      const categories = snapshot.docs.map((doc) => ({
+        id: doc.id, // Document ID
+        ...doc.data(), // Document Data
+      }));
+
+      return categories;
+    } catch (error) {
+      return rejectWithValue("Kategoriler alınırken bir hata oluştu.");
+    }
+  }
+);
+
+// Delete Category
+export const deleteCategory = createAsyncThunk(
+  "products/deleteCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const categoryRef = doc(db, "categories", id);
+
+      await deleteDoc(categoryRef);
+
+      return id;
+    } catch (error) {
+      return rejectWithValue("Kategori silme sırasında bir hata oluştu.");
+    }
+  }
+);
+
+// Update Category
+export const updateCategory = createAsyncThunk(
+  "products/updateCategory",
+  async ({ id, updatedCategory }, { rejectWithValue }) => {
+    try {
+      const categoryRef = doc(db, "categories", id);
+
+      await updateDoc(categoryRef, updatedCategory);
+
+      return { id, ...updatedCategory };
+    } catch (error) {
+      return rejectWithValue("Kategori güncelleme sırasında bir hata oluştu.");
+    }
+  }
+);
+
+// Add Subcategory
+export const addSubcategory = createAsyncThunk(
+  "products/addSubcategory",
+  async ({ parentId, subCategoryName }, { rejectWithValue }) => {
+    try {
+      // Ana kategoriyi referans al
+      const parentCategoryRef = doc(db, "categories", parentId);
+
+      // Ana kategori var mı kontrolü
+      const parentCategorySnap = await getDoc(parentCategoryRef);
+      if (!parentCategorySnap.exists()) {
+        return rejectWithValue("Ana kategori bulunamadı.");
+      }
+
+      // Firestore'daki subCategories dizisine alt kategori adı ekle
+      await updateDoc(parentCategoryRef, {
+        subCategories: arrayUnion(subCategoryName),
+        lastUpdated: new Date().toISOString(),
+      });
+
+      return { parentId, subCategoryName };
+    } catch (error) {
+      return rejectWithValue("Alt kategori ekleme sırasında bir hata oluştu.");
+    }
+  }
+);
+
 const initialState = {
   items: [],
+  categories: [],
   status: "idle",
   error: null,
 };
@@ -163,6 +272,85 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.error = action.payload;
         state.status = "failed";
+      })
+
+      // Add Category
+      .addCase(addCategory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addCategory.fulfilled, (state, action) => {
+        state.categories.push(action.payload);
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(addCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Fetch Categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.categories = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.error = action.payload;
+        state.status = "failed";
+      })
+
+      // Delete Category
+      .addCase(deleteCategory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.categories = state.categories.filter(
+          (category) => category.id !== action.payload
+        );
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Update Category
+      .addCase(updateCategory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        const updatedIndex = state.categories.findIndex(
+          (category) => category.id === action.payload.id
+        );
+        if (updatedIndex !== -1) {
+          state.categories[updatedIndex] = action.payload;
+        }
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Add Subcategory
+      .addCase(addSubcategory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addSubcategory.fulfilled, (state, action) => {
+        const updatedIndex = state.categories.findIndex(
+          (category) => category.id === action.payload.parentId
+        );
+        if (updatedIndex !== -1) {
+          state.categories[updatedIndex].subCategories.push(
+            action.payload.subCategoryName
+          );
+        }
+        state.status = "idle";
+        state.error = null;
+      })
+      .addCase(addSubcategory.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });

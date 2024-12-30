@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { addCustomer } from "../redux/CustomerSlice";
+import { fetchGroups } from '../redux/groupsSlice';
 
 const AddCustomer = () => {
 
     const navigate = useNavigate();
-
     const dispatch = useDispatch();
-
     const [isAdded, setIsAdded] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const { groups } = useSelector((state) => state.groups);
 
     const error = null;
 
@@ -25,6 +26,10 @@ const AddCustomer = () => {
     });
 
     const handleAddCustomer = () => {
+        if (!selectedGroup) {
+            alert("Grup seçiniz!");
+            return;
+        }
         if (!customer.name || !customer.manager || !customer.phone || !customer.email) {
             alert("Cari adı, yetkili, telefon numarası ve email zorunludur!");
             return;
@@ -44,12 +49,22 @@ const AddCustomer = () => {
         if (isAdded) {
             setTimeout(() => {
                 navigate('/customers');
-            }, 500);
+            }, 100);
         }
     }, [isAdded, navigate]);
 
+    useEffect(() => {
+        dispatch(fetchGroups());
+    }, [dispatch]);
+
     const handleCancel = () => {
         navigate('/customers');
+    };
+
+    const handleSelectGroup = (groupId) => {
+        const group = groups.find((group) => group.id === groupId);
+        setSelectedGroup(group);
+        setCustomer({ ...customer, group: groupId });
     };
 
     return (
@@ -63,7 +78,7 @@ const AddCustomer = () => {
                 </button>
             </div>
             <div className="w-full max-w-lg bg-gray-700 p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Yeni Cari Ekle</h2>
+                <h2 className="text-xl mb-4 font-bold">Yeni Cari Ekle</h2>
                 <div>
                     <label className="block mb-2">Cari Adı</label>
                     <input
@@ -80,6 +95,31 @@ const AddCustomer = () => {
                         name="manager"
                         value={customer.manager}
                         onChange={(e) => setCustomer({ ...customer, manager: e.target.value })}
+                        className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
+                    />
+
+                    <label className="block mb-2">Grup</label>
+                    <select
+                        value={selectedGroup?.id || ""}
+                        onChange={(e) => handleSelectGroup(e.target.value)}
+                        className="w-full p-3 rounded bg-gray-600 text-gray-100 mb-4"
+                    >
+                        <option value="" disabled>
+                            Grup Seçiniz
+                        </option>
+                        {groups.map((group) => (
+                            <option key={group.id} value={group.id}>
+                                {group.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label className="block mb-2 min-h-5">Adres</label>
+                    <input
+                        type="text"
+                        name="address"
+                        value={customer.address}
+                        onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
                     />
 

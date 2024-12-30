@@ -1,9 +1,9 @@
 import React from 'react';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
-import SaleMainGrid from '../components/salepage/SaleMainGrid';
+import PurchaseMainGrid from '../components/purchasepage/PurchaseMainGrid';
 
-const Sale = () => {
+const Purchases = () => {
     return (
         <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
             {/* Sidebar */}
@@ -12,15 +12,15 @@ const Sale = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <Header title={"Satış"} />
+                <Header title={"Alış"} />
 
 
                 {/* Main grid content */}
-                <SaleMainGrid />
+                <PurchaseMainGrid />
             </div>
         </div>
 
     );
 }
 
-export default Sale;
+export default Purchases;

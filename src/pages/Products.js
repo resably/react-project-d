@@ -9,13 +9,11 @@ const Products = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { items: products, status, error } = useSelector((state) => state.products);
+    const { items: products, status } = useSelector((state) => state.products);
 
     useEffect(() => {
         if (status === "idle") {
             dispatch(fetchProducts());
-            console.log('fetching products');
-            console.log(products);
         }
     }, [status, dispatch]);
 
@@ -39,13 +37,9 @@ const Products = () => {
         }
     };
 
-    if (status === "loading") {
-        return <p className="text-white">Ürünler yükleniyor...</p>;
-    }
-
-    if (status === "failed") {
-        return <p className="text-red-500">Hata: {error}</p>;
-    }
+    const handleCategoriesRedirect = () => {
+        navigate('/products/categories');
+    };
 
     return (
         <div className="flex h-screen bg-[#111827] text-gray-100 overflow-hidden">
@@ -60,6 +54,19 @@ const Products = () => {
                         Ürün Ekle
                     </button>
 
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ml-4"
+                    >
+                        Stok Güncelle
+                    </button>
+
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition ml-4"
+                        onClick={handleCategoriesRedirect}
+                    >
+                        Kategoriler
+                    </button>
+
                     <table className="table-auto w-full mt-4 bg-gray-800 rounded">
                         <thead>
                             <tr>
@@ -67,9 +74,10 @@ const Products = () => {
                                 <th className="px-4 py-2">Ürün Adı</th>
                                 <th className="px-4 py-2">Marka</th>
                                 <th className="px-4 py-2">Kategori</th>
-                                <th className="px-4 py-2">Miktar</th>
-                                <th className="px-4 py-2">Alış Fiyatı</th>
-                                <th className="px-4 py-2">Satış Fiyatı</th>
+                                <th className="px-4 py-2 max-w-24">Alt Kategori</th>
+                                <th className="px-4 py-2">Stok</th>
+                                <th className="px-4 py-2 max-w-4">Alış Fiyatı</th>
+                                <th className="px-4 py-2 max-w-4">Satış Fiyatı</th>
                                 <th className="px-4 py-2">İşlemler</th>
                             </tr>
                         </thead>
@@ -80,10 +88,11 @@ const Products = () => {
                                     <td className="border border-gray-700 px-4 py-2">{product.name}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.brand}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.category}</td>
-                                    <td className="border border-gray-700 px-4 py-2">{product.stock}</td>
+                                    <td className="border border-gray-700 px-4 py-2">{product.subCategory}</td>
+                                    <td className={`border border-gray-700 px-4 py-2 ${product.stock <= 3 ? 'text-red-500' : 'text-white'}`}>{product.stock}</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.purchasePrice} TL</td>
                                     <td className="border border-gray-700 px-4 py-2">{product.price} TL</td>
-                                    <td className="border border-gray-700 px-4 py-2">
+                                    <td className="border border-gray-700 px-4 py-2 max-w-40">
                                         <div className="flex justify-center gap-3">
                                             {/* Sil Butonu */}
                                             <button
@@ -105,7 +114,6 @@ const Products = () => {
                                             <button
                                                 className="text-white hover:bg-green-400 bg-green-500 px-2 py-1 rounded font-light text-base w-20"
                                                 onClick={() => handleProductDetailsRedirect(product.id)}
-                                            // Detaylar butonu için gerekli handle eklenebilir
                                             >
                                                 Detaylar
                                             </button>

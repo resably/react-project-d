@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct } from "../redux/ProductsSlice";
-import { use } from 'react';
+import { addProduct, fetchCategories } from "../redux/ProductsSlice";
 
 
 const AddProduct = () => {
@@ -11,8 +10,10 @@ const AddProduct = () => {
 
     const dispatch = useDispatch();
     const { error } = useSelector((state) => state.products);
-
     const [isAdded, setIsAdded] = useState(false);
+    const [subCategories, setSubCategories] = useState([]);
+    const [noSubCategories, setNoSubCategories] = useState(false);
+    const { categories } = useSelector((state) => state.products);
 
 
     const [product, setProduct] = useState({
@@ -20,14 +21,15 @@ const AddProduct = () => {
         name: '',
         brand: '',
         category: '',
+        subCategory: '',
         stock: 0,
         purchasePrice: 0,
         price: 0,
     });
 
     const handleAddProduct = () => {
-        if (!product.barcode || !product.name) {
-            alert("Barkod ve ürün adı zorunludur!");
+        if (!product.barcode || !product.name || !product.category) {
+            alert("Barkod ürün adı ve kategori zorunludur!");
             return;
         }
 
@@ -49,10 +51,30 @@ const AddProduct = () => {
         }
     }, [isAdded, navigate]);
 
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
-    // Handle cancel button click
     const handleCancel = () => {
         navigate('/products');
+    };
+
+    const handleCategoryChange = (e) => {
+        const selectedCategoryId = e.target.value;
+        setProduct({ ...product, category: selectedCategoryId, subCategory: "" });
+
+        // Seçilen kategoriye ait alt kategorileri filtrele
+        const selectedCategory = categories.find(
+            (category) => category.id === selectedCategoryId
+        );
+
+        if (selectedCategory && selectedCategory.subCategories.length > 0) {
+            setSubCategories(selectedCategory.subCategories);
+            setNoSubCategories(false); // Alt kategoriler varsa, "Alt kategori yok" mesajını kaldır
+        } else {
+            setSubCategories([]);
+            setNoSubCategories(true); // Alt kategori yoksa, "Alt kategori yok" mesajını göster
+        }
     };
 
     return (
@@ -66,7 +88,7 @@ const AddProduct = () => {
                 </button>
             </div>
             <div className="w-full max-w-lg bg-gray-700 p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Ürün Ekle</h2>
+                <h2 className="text-xl mb-4 font-bold">Ürün Ekle</h2>
                 <div>
                     <label className="block mb-2">Ürün Barkodu:</label>
                     <input
@@ -96,13 +118,37 @@ const AddProduct = () => {
                     />
 
                     <label className="block mb-2">Kategori:</label>
-                    <input
-                        type="text"
-                        name="category"
+                    <select
                         value={product.category}
-                        onChange={(e) => setProduct({ ...product, category: e.target.value })}
+                        onChange={handleCategoryChange}
                         className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
-                    />
+                    >
+                        <option value="">Kategori Seçiniz</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.name}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label className="block mb-2">Alt Kategori:</label>
+                    <select
+                        value={product.subCategory}
+                        onChange={(e) => setProduct({ ...product, subCategory: e.target.value })}
+                        className="w-full p-2 mb-4 rounded bg-gray-600 text-gray-100"
+                        disabled={noSubCategories} // Alt kategori yoksa seçimi disable et
+                    >
+                        <option value="">Alt Kategori Seçiniz</option>
+                        {noSubCategories ? (
+                            <option disabled>Alt Kategori Yok</option> // Alt kategori yoksa mesaj göster
+                        ) : (
+                            subCategories.map((subCategory) => (
+                                <option key={subCategory.id} value={subCategory.id}>
+                                    {subCategory}
+                                </option>
+                            ))
+                        )}
+                    </select>
 
                     <label className="block mb-2">Adet:</label>
                     <input
@@ -146,39 +192,7 @@ const AddProduct = () => {
                         </button>
                     </div>
                 </div>
-
                 {error && <p style={{ color: "red" }}>{error}</p>}
-
-                {/* Confirmation table (temporary, only shows after product is added)
-                    {addedProduct && (
-                        <div className="mt-8 p-4 bg-gray-600 rounded">
-                            <h3 className="text-lg mb-4">Ürün Eklendi!</h3>
-                            <table className="table-auto w-full bg-gray-700 rounded">
-                                <thead>
-                                    <tr>
-                                        <th className="px-4 py-2">Barkod</th>
-                                        <th className="px-4 py-2">Ürün Adı</th>
-                                        <th className="px-4 py-2">Marka</th>
-                                        <th className="px-4 py-2">Kategori</th>
-                                        <th className="px-4 py-2">Adet</th>
-                                        <th className="px-4 py-2">Alış Fiyatı</th>
-                                        <th className="px-4 py-2">Satış Fiyatı</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="border px-4 py-2">{addedProduct.barcode}</td>
-                                        <td className="border px-4 py-2">{addedProduct.name}</td>
-                                        <td className="border px-4 py-2">{addedProduct.brand}</td>
-                                        <td className="border px-4 py-2">{addedProduct.category}</td>
-                                        <td className="border px-4 py-2">{addedProduct.stock}</td>
-                                        <td className="border px-4 py-2">{addedProduct.purchasePrice}₺</td>
-                                        <td className="border px-4 py-2">{addedProduct.price}₺</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    )} */}
             </div>
         </div>
     );

@@ -12,14 +12,13 @@ const ToSale = () => {
             {/* Main content */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <Header title={"Dashboard"} />
+                <Header title={"Satış Ekranı"} />
 
 
                 {/* Main grid content */}
                 <SaleGrid />
             </div>
         </div>
-
     );
 }
 

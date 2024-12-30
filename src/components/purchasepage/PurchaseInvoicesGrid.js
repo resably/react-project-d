@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSales } from '../../redux/salesSlice';
+import { fetchPurchases } from '../../redux/purchasesSlice';
 
-const SaleInvoicesGrid = () => {
+const PurchaseInvoicesGrid = () => {
     const dispatch = useDispatch();
-    const { sales, status } = useSelector((state) => state.sales);
+    const { purchases, status } = useSelector((state) => state.purchases);
 
     useEffect(() => {
         if (status === 'idle') {
-            dispatch(fetchSales());
+            dispatch(fetchPurchases());
         }
     }, [dispatch, status]);
 
@@ -29,27 +29,27 @@ const SaleInvoicesGrid = () => {
                     </tr>
                 </thead>
                 <tbody className="table-auto w-full mt-4 bg-gray-800">
-                    {sales.map((sale) => (
-                        <tr key={sale.id}>
-                            <td className="border border-gray-700 px-4 py-2">{sale.customerName}</td>
-                            <td className="border border-gray-700 px-4 py-2">{sale.customerManager}</td>
-                            <td className="border border-gray-700 px-4 py-2">{sale.paymentType}</td>
-                            <td className="border border-gray-700 px-4 py-2">{sale.totalPrice} TL</td>
-                            <td className="border border-gray-700 px-4 py-2"> {new Date(sale.saleDate).toLocaleDateString("tr-TR", {
+                    {purchases.map((purchase) => (
+                        <tr key={purchase.id}>
+                            <td className="border border-gray-700 px-4 py-2">{purchase.customerName}</td>
+                            <td className="border border-gray-700 px-4 py-2">{purchase.customerManager}</td>
+                            <td className="border border-gray-700 px-4 py-2">{purchase.paymentType}</td>
+                            <td className="border border-gray-700 px-4 py-2">{purchase.totalPrice} TL</td>
+                            <td className="border border-gray-700 px-4 py-2"> {new Date(purchase.saleDate).toLocaleDateString("tr-TR", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                                 hour: "2-digit",
                                 minute: "2-digit",
                             })}</td>
-                            <td className="border border-gray-700 px-4 py-2">{new Date(sale.lastUpdated).toLocaleDateString("tr-TR", {
+                            <td className="border border-gray-700 px-4 py-2">{new Date(purchase.lastUpdated).toLocaleDateString("tr-TR", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                                 hour: "2-digit",
                                 minute: "2-digit",
                             })}</td>
-                            <td className="border border-gray-700 px-4 py-2">{sale.type}</td>
+                            <td className="border border-gray-700 px-4 py-2">{purchase.type}</td>
                             <td className="border border-gray-700 px-4 py-2 max-w-40">
                                 <div className="flex justify-center gap-3">
                                     {/* Sil Butonu */}
@@ -82,4 +82,5 @@ const SaleInvoicesGrid = () => {
     );
 };
 
-export default SaleInvoicesGrid;
+
+export default PurchaseInvoicesGrid;
