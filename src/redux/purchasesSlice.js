@@ -28,10 +28,11 @@ export const updateProductStocks = createAsyncThunk(
                 if (productSnap.exists()) {
                     const currentStock = productSnap.data().stock || 0;
                     const newStock = currentStock + product.quantity;
+                    const newPurchasePrice = product.price;
                     
                     
                     // Stok değerini güncelle
-                    await updateDoc(productRef, { stock: newStock });
+                    await updateDoc(productRef, { stock: newStock , purchasePrice: newPurchasePrice });
                 } else {
                     throw new Error(`${product.name} (Barkod: ${product.barcode}) bulunamadı.`);
                 }

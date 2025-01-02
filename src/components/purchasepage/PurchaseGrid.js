@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { savePurchase, updateProductStocks } from "../../redux/purchasesSlice";
 import { fetchCustomers } from "../../redux/CustomerSlice";
-import { fetchProducts } from "../../redux/ProductsSlice";
+import { fetchProducts, addProduct } from "../../redux/ProductsSlice";
 
 function SaleGrid() {
 
@@ -26,22 +26,49 @@ function SaleGrid() {
   );
 
   const handleAddProduct = (product) => {
-    const exists = selectedProducts.find((p) => p.id === product.id);
-    if (exists) {
-      // Eğer ürün zaten var ise, adedini artır
-      setSelectedProducts(selectedProducts.map((p) =>
-        p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
-      ));
+    if (!product) {
+      //
+      const newProduct = {
+        id: Date.now(), // Her ürün için benzersiz ID 
+        barcode: searchQuery,
+        name: "", 
+        category: "",
+        price: 0,
+        purchasePrice: 0,
+        quantity: 1,
+        isNew: true,
+      };
+      setSelectedProducts([...selectedProducts, newProduct]);
     } else {
-      // Eğer ürün yoksa, yeni ürün ekle
-      setSelectedProducts([...selectedProducts, { ...product, quantity: 1 }]);
+      const exists = selectedProducts.find((p) => p.id === product.id);
+      if (exists) {
+        // Eğer ürün zaten varsa
+        setSelectedProducts(
+          selectedProducts.map((p) =>
+            p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
+          )
+        );
+      } else {
+        // Eğer ürün yoksa
+        setSelectedProducts([...selectedProducts, { ...product, quantity: 1 }]);
+      }
     }
     setSearchQuery("");
   };
 
+
   const handleRemoveProduct = (id) => {
     setSelectedProducts(selectedProducts.filter((p) => p.id !== id));
   };
+
+  const handleProductNameChange = (id, newName) => {
+    setSelectedProducts((prev) =>
+      prev.map((product) =>
+        product.id === id ? { ...product, name: newName } : product
+      )
+    );
+  };
+
 
   const handleQuantityChange = (id, quantity) => {
     setSelectedProducts((prev) =>
@@ -53,10 +80,18 @@ function SaleGrid() {
     );
   };
 
+  const handleProductPriceChange = (id, newPurchasePrice) => {
+    setSelectedProducts((prev) =>
+      prev.map((product) =>
+        product.id === id ? { ...product, purchasePrice: newPurchasePrice } : product
+      )
+    );
+  };
+
 
   useEffect(() => {
     const total = selectedProducts.reduce(
-      (acc, product) => acc + product.price * product.quantity,
+      (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
     setTotalPrice(total);
@@ -71,7 +106,7 @@ function SaleGrid() {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedCustomer) {
       alert("Lütfen bir müşteri seçin!");
       return;
@@ -81,11 +116,51 @@ function SaleGrid() {
       alert("Lütfen bir ödeme türü seçin!");
       return;
     }
+
+    // Yeni ürün kontrolü
+    const newProducts = invoiceProducts.filter(
+      (product) => product.isNew || !product.id
+    );
+
+    for (const product of newProducts) {
+      if (!product.name || product.purchasePrice <= 0) {
+        alert(`Yeni eklenen ürünlerin adı, fiyatı ve kategorisi zorunludur! (Barkod: ${product.barcode})`);
+        return;
+      }
+
+      try {
+        const addedProduct = await dispatch(
+          addProduct({
+            barcode: product.barcode,
+            name: product.name,
+            brand: product.brand || "",
+            category: product.category,
+            subCategory: product.subCategory || "",
+            stock: product.quantity || 0,
+            purchasePrice: product.purchasePrice,
+            price: product.price || 0,
+          })
+        ).unwrap();
+
+        setInvoiceProducts((prev) =>
+          prev.map((p) =>
+            p.barcode === product.barcode
+              ? { ...p, id: addedProduct.id }
+              : p
+          )
+        );
+      } catch (error) {
+        console.error("Yeni ürün ekleme hatası:", error);
+        alert(error || "Yeni ürün eklenirken hata oluştu.");
+        return;
+      }
+    }
+
     const saleData = {
       products: invoiceProducts.map((product) => ({
         name: product.name,
         barcode: product.barcode,
-        price: product.price,
+        price: product.purchasePrice,
         quantity: product.quantity,
         total: product.price * product.quantity,
       })),
@@ -99,7 +174,6 @@ function SaleGrid() {
       lastUpdated: new Date().toISOString(),
     };
 
-    // Önce satışı kaydet
     dispatch(savePurchase(saleData))
       .unwrap()
       .then(() => {
@@ -107,17 +181,18 @@ function SaleGrid() {
         return dispatch(updateProductStocks(saleData.products)).unwrap();
       })
       .then(() => {
-        alert('Satış ve stok güncellemesi başarılı!');
+        alert("Satış ve stok güncellemesi başarılı!");
         setSelectedProducts([]);
         setInvoiceProducts([]);
         setTotalPrice(0);
         dispatch(fetchProducts());
       })
       .catch((err) => {
-        console.error('Hata:', err);
-        alert(`İşlem başarısız: ${err}`);
+        console.error("Satış kaydetme hatası:", err);
+        alert(`Satış kaydedilirken hata oluştu: ${err.message}`);
       });
   };
+
 
   const handleSelectCustomer = (customerId) => {
     const customer = customers.find((c) => c.id === customerId);
@@ -233,8 +308,36 @@ function SaleGrid() {
                 {selectedProducts.map((product) => (
                   <tr key={product.id}>
                     <td className="px-6 py-4">{product.barcode}</td>
-                    <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">{product.price} TL</td>
+                    <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        value={product.name}
+                        onChange={(e) =>
+                          setSelectedProducts((prev) =>
+                            prev.map((p) =>
+                              p.id === product.id ? { ...p, name: e.target.value } : p
+                            )
+                          )
+                        }
+                        placeholder="Ürün adı"
+                        className="w-full p-2 bg-gray-800 text-white rounded-md"
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        value={product.purchasePrice}
+                        onChange={(e) =>
+                          setSelectedProducts((prev) =>
+                            prev.map((p) =>
+                              p.id === product.id ? { ...p, purchasePrice: parseFloat(e.target.value) || 0 } : p
+                            )
+                          )
+                        }
+                        placeholder="Ürün fiyatı"
+                        className="w-full p-2 bg-gray-800 text-white rounded-md"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <input
                         type="number"
@@ -271,19 +374,34 @@ function SaleGrid() {
             className="w-full p-4 border border-gray-600 rounded-lg bg-gray-800 text-white mb-6"
           />
           <div className={`product-list ${searchQuery ? "block" : "hidden"} max-h-[250px] overflow-y-auto`}>
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="product-row flex justify-between p-3 bg-gray-900 border border-gray-600 rounded-md mb-2 hover:bg-gray-700">
-                <span>{product.barcode}</span>
-                <span>{product.name}</span>
-                <span>{product.price} TL</span>
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="product-row flex justify-between p-3 bg-gray-900 border border-gray-600 rounded-md mb-2 hover:bg-gray-700"
+                >
+                  <span>{product.barcode}</span>
+                  <span>{product.name}</span>
+                  <span>{product.purchasePrice} TL</span>
+                  <button
+                    onClick={() => handleAddProduct(product)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-400"
+                  >
+                    Ekle
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-between p-3 bg-gray-900 border border-gray-600 rounded-md mb-2">
+                <span>Ürün bulunamadı.</span>
                 <button
-                  onClick={() => handleAddProduct(product)}
+                  onClick={() => handleAddProduct(null)}
                   className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-400"
                 >
-                  Ekle
+                  Yeni Ürün Ekle
                 </button>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -307,9 +425,9 @@ function SaleGrid() {
                 {invoiceProducts.map((product) => (
                   <tr key={product.id}>
                     <td className="px-3 py-2">{product.name}</td>
-                    <td className="px-3 py-2">{product.price * product.quantity} TL</td>
+                    <td className="px-3 py-2">{product.purchasePrice * product.quantity} TL</td>
                     <td className="px-3 py-2">
-                      {(product.price * product.quantity * VAT_RATE).toFixed(2)} TL
+                      {(product.purchasePrice * product.quantity * VAT_RATE).toFixed(2)} TL
                     </td>
                     <td className="px-3 py-2">{product.quantity} adet</td>
                   </tr>
