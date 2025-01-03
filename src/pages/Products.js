@@ -42,7 +42,7 @@ const Products = () => {
     };
 
     return (
-        <div className="flex h-screen bg-[#111827] text-gray-100 overflow-hidden">
+        <div className="flex h-screen bg-[#111827] text-gray-100 overflow-y-auto">
             <Sidebar />
             <div className="flex-1 flex flex-col">
                 <Header title="Ürünler" />

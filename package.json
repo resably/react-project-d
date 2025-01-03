@@ -1,6 +1,6 @@
 {
-  "name": "kv",
-  "version": "0.1.0",
+  "name": "projectd",
+  "version": "0.1.0f",
   "private": true,
   "dependencies": {
     "@babel/preset-env": "^7.26.0",

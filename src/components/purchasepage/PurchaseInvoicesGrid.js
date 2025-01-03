@@ -7,14 +7,13 @@ const PurchaseInvoicesGrid = () => {
     const { purchases, status } = useSelector((state) => state.purchases);
 
     useEffect(() => {
-        if (status === 'idle') {
-            dispatch(fetchPurchases());
-        }
-    }, [dispatch, status]);
+        dispatch(fetchPurchases());
+        console.log("p: ", purchases);
+    }, [dispatch]);
 
 
     return (
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto">
             <table className="table-auto w-full mt-4 bg-gray-800 rounded">
                 <thead>
                     <tr>
