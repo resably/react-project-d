@@ -1,6 +1,6 @@
 # Project D
 
-### COMMİT ATARKEN DİKKAT EDİN
+### React - Firebase
 
 
 ## Available Scripts
